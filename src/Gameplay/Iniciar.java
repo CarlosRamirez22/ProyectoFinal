@@ -45,7 +45,7 @@ public class Iniciar extends JPanel{
     /** objeto sobre el menu principal*/
     private MenuPrincipal menu;
     /** objetos sobre los timer para agregarEnemigos, agregarGas y la espera del Game Over */
-    private Timer agregarEnemigoAleatorio, agregarGasAleatorio,espera;
+    private Timer agregarEnemigoAleatorio, agregarGasAleatorio,espera,timer;
     /** objetos sobre el puntajeObtenido, el tiempo de juego y un contador */
     private int PuntajeObtenido, tiempoJuego,contador;
     /** objeto de la clase explosiones para realizar las animaciones */
@@ -65,6 +65,9 @@ public class Iniciar extends JPanel{
     /** JLabel que muestra el fin del juego*/
     private JLabel FindelJuego;
     
+    private JLabel LifeMenos;
+    
+    private int aux=0;
     /**
      * Metodo constructor que recibe como parametros el menu principal y la barra lateral del juego
      * @param puntaje barra lateral 
@@ -81,6 +84,9 @@ public class Iniciar extends JPanel{
      public void inicializar() throws IOException{
         this.setLayout(null); 
         this.setBounds(0, 0, 600, 600);
+        LifeMenos= new JLabel(new ImageIcon("recursos/life.png"));
+        LifeMenos.setBounds(100,66,400,150);
+        LifeMenos.setVisible(false);
         FindelJuego = new JLabel(new ImageIcon("recursos/FinalLabel.png"));
         FindelJuego.setBounds(100, 120, 400, 300);
         FindelJuego.setVisible(false);
@@ -101,6 +107,7 @@ public class Iniciar extends JPanel{
         naveChoca=false;
         
         this.add(FindelJuego);
+        this.add(LifeMenos);
         
         agregarEnemigoAleatorio = new Timer( TiempoAleatorio()*1000 , new ActionListener(){
             @Override
@@ -272,7 +279,6 @@ public class Iniciar extends JPanel{
         
               music.DetenerSonidoMenu();
               music.SonidoJuego();
-          
         
         /**
          * Se inicia una cuenta regresiva en el tiempo de juego
@@ -318,7 +324,8 @@ public class Iniciar extends JPanel{
                        || detectarColision.ColisionLadoIzquierdo(nave, colisiones) == true){
                    
                    stopProcesos();
-                   sound.SonidoExplosion();//sonido.reproducirSonidoExplosion();
+                   sound.SonidoMenosLife();
+                   sound.SonidoExplosion();
                    explo.animacionExplosion(nave, timerJuego);
                    naveChoca = true;
                    
@@ -497,11 +504,20 @@ public class Iniciar extends JPanel{
     private void comprobarSTOP() throws IOException{
  
         music.DetenerSonidoMenu();
+        
          if(puntaje.getCombustible().getValue()<=0){
-             //Resto vidas Al Player
-            puntaje.setVidas(puntaje.getVidas()-1);
              
-             puntaje.getCombustible().setValue(100);
+            LifeMenos.setVisible(true);
+            aux=1;
+            //Resto vidas Al Player
+            sound.SonidoMenosLife();
+            puntaje.setVidas(puntaje.getVidas()-1);
+            puntaje.getCombustible().setValue(100);
+         }
+        
+         if(puntaje.getCombustible().getValue()<=90 && aux==1){
+             aux=0;
+             LifeMenos.setVisible(false);
          }
          //En caso de que la nave
          if(naveChoca == true){
@@ -552,7 +568,7 @@ public class Iniciar extends JPanel{
      * Metodo que se utiliza para reiniciar los procesos para cuando el jugador choca
      */
     private void resetProcesos(){
-            
+        
         timerJuego.start();
         colisiones.setMove(5);
         nave.setMove_derecha(10);
@@ -595,7 +611,7 @@ public class Iniciar extends JPanel{
      */
      public void FinDelJuego() throws IOException{
         music.DetenerSonidoJuego();
-        
+        LifeMenos.setVisible(false);
         contador = 0;
  
           for(Gas gas: combustible){

@@ -21,6 +21,7 @@ public class FX {
     private AudioClip SoundGas;
     private AudioClip Puntos;
     private AudioClip Lose;
+    private AudioClip Life;
     private URL url2;
 
     public FX() {
@@ -48,6 +49,13 @@ public class FX {
         URL url = getClass().getResource("Juego.wav");
         Juego = Applet.newAudioClip(url);  
         Juego.loop();
+    }
+    
+    public void SonidoMenosLife(){
+        URL url = getClass().getResource("life.wav");
+        Life = Applet.newAudioClip(url);
+        Life.play();
+        
     }
     
     public void DetenerSonidoJuego(){
